@@ -9,10 +9,11 @@ using MonoTanksBotLogic.Models;
 
 namespace BotReceiver
 {
-    public class BotReceiver
+    public class BotReceiverLogic
     {
-        public bool IsEntityInRowOrColumn(Tile[,] map)
+        public Direction? GetEnemysPositionInRowOrColumn(Tile[,] map)
         {
+
             int rowCount = map.GetLength(0); // liczba wierszy mapy
             int colCount = map.GetLength(1); // liczba kolumn mapy
 
@@ -33,33 +34,85 @@ namespace BotReceiver
                     break;
             }
 
-            // Jeśli nie znaleziono naszego czołgu, kończymy metodę
-            if (!ownTankPosition.HasValue)
-                return false;
-
             int tankRow = ownTankPosition.Value.row;
             int tankCol = ownTankPosition.Value.col;
 
-            // Sprawdzamy cały rząd
-            for (int i = 0; i < colCount; i++)
+            // Sprawdzamy cały rząd na prawo
+            for (int i = tankCol+1; i < colCount; i++)
             {
-                if (i != tankCol && map[tankRow, i].Entities.Length > 0)
+                if (map[tankRow, i].Entities.Any(entity => entity is Tile.Wall))
                 {
-                    return true; // Znaleziono jednostkę w naszym rzędzie
+                    break; 
+                }
+                if (map[tankRow, i].Entities.Any(entity => entity is Tile.EnemyTank))
+                {
+                    return Direction.Right;
                 }
             }
 
-            // Sprawdzamy całą kolumnę
-            for (int i = 0; i < rowCount; i++)
+            // Sprawdzamy cały rząd na prawo
+            for (int i = tankCol-1; i >= 0; i--)
             {
-                if (i != tankRow && map[i, tankCol].Entities.Length > 0)
+                if (map[tankRow, i].Entities.Any(entity => entity is Tile.Wall))
                 {
-                    return true; // Znaleziono jednostkę w naszej kolumnie
+                    break;
+                }
+                if (map[tankRow, i].Entities.Any(entity => entity is Tile.EnemyTank))
+                {
+                    return Direction.Left;
+                }
+            }
+
+            // Sprawdzamy całą kolumnę w dół
+            for (int i = tankRow+1; i < rowCount; i++)
+            {
+                if (map[i, tankCol].Entities.Any(entity => entity is Tile.Wall))
+                {
+                    break;
+                }
+                if (map[i, tankCol].Entities.Any(entity => entity is Tile.EnemyTank))
+                {
+                    return Direction.Down;
+                }
+            }
+
+            // Sprawdzamy całą kolumnę w górę
+            for (int i = tankRow - 1; i >= 0; i--)
+            {
+                if (map[i, tankCol].Entities.Any(entity => entity is Tile.Wall))
+                {
+                    break;
+                }
+                if (map[i, tankCol].Entities.Any(entity => entity is Tile.EnemyTank))
+                {
+                    return Direction.Up;
                 }
             }
 
             // Brak jednostek w naszym rzędzie ani kolumnie
-            return false;
+            return null;
+        }
+
+        public Direction? GetTurretDirection(Tile[,] map)
+        {
+            int rowCount = map.GetLength(0); // liczba wierszy mapy
+            int colCount = map.GetLength(1); // liczba kolumn mapy
+            for (int y = 0; y < map.GetLength(0); y++)
+            {
+                for (int x = 0; x < map.GetLength(1); x++)
+                {
+                    foreach (var entity in map[y, x].Entities)
+                    {
+                        
+                        if (entity is Tile.OwnTank ownTank)
+                        {
+                            return ownTank.Turret.Direction;
+                        }
+                        
+                    }
+                }
+            }
+            return null;
         }
 
 
