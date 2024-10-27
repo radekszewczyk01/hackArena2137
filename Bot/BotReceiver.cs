@@ -161,8 +161,6 @@ namespace BotReceiver
 
             // Znajdź ścieżkę do najbliższego kafelka w strefie
             var path = BFS(map, ownTankPosition.Value, (int)targetZoneIndex);
-            Console.WriteLine($"row: {ownTankPosition.Value.row}, col: {ownTankPosition.Value.col}\n\n");
-            WypiszListe(path);
             if (path == null) return null; // Jeśli brak ścieżki, zwróć null
 
             // Przetwórz ścieżkę na stos instrukcji

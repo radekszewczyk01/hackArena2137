@@ -20,6 +20,7 @@ public class Bot : IBot
 
     public BotResponse NextMove(GameState gameState)
     {
+        //  dodac funkcje, która sprawdza, czy nasz czołg jest żywy
         if (!botReceiverLogic.IsTankInAnyZone(gameState.Map))
         {
             if (botResponseStack != null && botResponseStack.Count > 0)
@@ -37,8 +38,18 @@ public class Bot : IBot
                 return botResponseStack.Pop();
             }
         }
-        this.botReceiverLogic.PrintOwnTankPosition(gameState.Map);
-        return BotResponse.Rotate(Rotation.Left, Rotation.Left);
+        //this.botReceiverLogic.PrintOwnTankPosition(gameState.Map);
+
+        //kreci sie i szuka przeciwnikow
+        BotResponse? attackIfEnemyInRange = this.botReceiverLogic.DecisionToAttack(gameState.Map);
+        if (attackIfEnemyInRange != null)
+        {
+            return attackIfEnemyInRange;
+        }
+        return BotResponse.Rotate(null, Rotation.Left);
+
+
+
         //Console.WriteLine("Map:");
         //for (int y = 0; y < gameState.Map.GetLength(0); y++)
         //{
