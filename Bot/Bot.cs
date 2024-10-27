@@ -8,6 +8,7 @@ public class Bot : IBot
 {
     private string myId;
     private BotReceiverLogic botReceiverLogic;
+    private Stack<BotResponse> botResponseStack;
 
     public Bot(LobbyData lobbyData)
     {
@@ -19,11 +20,25 @@ public class Bot : IBot
 
     public BotResponse NextMove(GameState gameState)
     {
-        if(this.botReceiverLogic.GetEnemysPositionInRowOrColumn(gameState.Map) == this.botReceiverLogic.GetTurretDirection(gameState.Map))
+        if (!botReceiverLogic.IsTankInAnyZone(gameState.Map))
         {
-            return BotResponse.UseAbility(AbilityType.FireBullet);
+            if (botResponseStack != null && botResponseStack.Count > 0)
+            {
+                BotResponse? attackIfEnemyInRange = this.botReceiverLogic.DecisionToAttack(gameState.Map);
+                if (attackIfEnemyInRange != null)
+                {
+                    return attackIfEnemyInRange;
+                }
+                return botResponseStack.Pop();
+            }
+            else
+            {
+                this.botResponseStack = this.botReceiverLogic.GeneratePathToNearestZone(gameState.Map, this.botReceiverLogic.FindAnyZoneIndex(gameState.Map));
+                return botResponseStack.Pop();
+            }
         }
-        return BotResponse.Pass();
+        this.botReceiverLogic.PrintOwnTankPosition(gameState.Map);
+        return BotResponse.Rotate(Rotation.Left, Rotation.Left);
         //Console.WriteLine("Map:");
         //for (int y = 0; y < gameState.Map.GetLength(0); y++)
         //{
