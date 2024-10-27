@@ -38,13 +38,13 @@ public class Bot : IBot
                 return botResponseStack.Pop();
             }
         }
-        //this.botReceiverLogic.PrintOwnTankPosition(gameState.Map);
+        this.botReceiverLogic.PrintOwnTankPosition(gameState.Map);
 
         //kreci sie i szuka przeciwnikow
-        BotResponse? attackIfEnemyInRange = this.botReceiverLogic.DecisionToAttack(gameState.Map);
-        if (attackIfEnemyInRange != null)
+        BotResponse? attackIfEnemyInRangee = this.botReceiverLogic.DecisionToAttack(gameState.Map);
+        if (attackIfEnemyInRangee != null)
         {
-            return attackIfEnemyInRange;
+            return attackIfEnemyInRangee;
         }
         return BotResponse.Rotate(null, Rotation.Left);
 
